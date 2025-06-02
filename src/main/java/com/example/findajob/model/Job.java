@@ -1,5 +1,6 @@
 package com.example.findajob.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
@@ -40,6 +41,7 @@ public class Job {
     private Enterprise enterprise;
 
     @OneToMany(mappedBy = "job")
+    @JsonIgnore
     private List<Application> applications = new ArrayList<>();
 
     public Job() {

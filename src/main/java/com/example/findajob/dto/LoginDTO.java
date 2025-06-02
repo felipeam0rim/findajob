@@ -1,5 +1,8 @@
 package com.example.findajob.dto;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+@CrossOrigin("*")
 public class LoginDTO {
     private String email;
     private String password;

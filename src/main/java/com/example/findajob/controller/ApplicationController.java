@@ -29,7 +29,7 @@ public class ApplicationController {
         this.jobRepository = jobRepository;
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Application> applyToJob(@RequestParam Long userId, @RequestParam Long jobId) {
         Optional<Application> existing = applicationRepository.findByUserIdAndJobId(userId, jobId);
         if (existing.isPresent()) {

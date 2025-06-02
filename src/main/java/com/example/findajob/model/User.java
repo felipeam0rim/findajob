@@ -1,5 +1,6 @@
 package com.example.findajob.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -106,6 +107,7 @@ public class User {
         return adress;
     }
 
+    @JsonIgnore
     public List<Application> getApplications() {
         return applications;
     }

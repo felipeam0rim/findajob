@@ -1,13 +1,16 @@
 package com.example.findajob.controller;
 
 import com.example.findajob.dto.LoginDTO;
+import com.example.findajob.model.Academic;
 import com.example.findajob.model.Enterprise;
+import com.example.findajob.repository.AcademicRepository;
 import com.example.findajob.repository.EnterpriseRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/enterprises")
@@ -15,9 +18,11 @@ import java.util.List;
 public class EnterpriseController {
 
     private final EnterpriseRepository enterpriseRepository;
+    private final AcademicRepository academicRepository;
 
-    public EnterpriseController(EnterpriseRepository enterpriseRepository) {
+    public EnterpriseController(EnterpriseRepository enterpriseRepository, AcademicRepository academicRepository) {
         this.enterpriseRepository = enterpriseRepository;
+        this.academicRepository = academicRepository;
     }
 
     @GetMapping("/listAll")
@@ -59,17 +64,28 @@ public class EnterpriseController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         Enterprise enterprise = enterpriseRepository.findByEmail(loginDTO.getEmail());
+        Academic academic = academicRepository.findByEmail(loginDTO.getEmail());
 
-        if (enterprise == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empresa não encontrada");
+        if(enterprise != null) {
+            if (!enterprise.getPassword().equals(loginDTO.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha incorreta");
+            }
+            return ResponseEntity.ok().body(Map.of(
+                    "tipo", "empresa",
+                    "dados", enterprise
+            ));
         }
 
-        if (!enterprise.getPassword().equals(loginDTO.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha incorreta");
+        if (academic != null) {
+            if (!academic.getPassword().equals(loginDTO.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Senha incorreta");
+            }
+            return ResponseEntity.ok().body(Map.of(
+                    "tipo", "academico",
+                    "dados", academic
+            ));
         }
-
-        // Se quiser, retorne um DTO em vez da entidade completa
-        return ResponseEntity.ok(enterprise);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro desconhecido");
     }
 }
 
